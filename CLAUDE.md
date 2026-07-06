@@ -36,6 +36,12 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
 - **Docker:** the image defaults to HTTP transport (`MCP_TRANSPORT=http`,
   `HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port. Runs as a
   non-root user.
+- **Releasing:** `make release` (`BUMP=patch|minor|major`, default patch) bumps
+  the version, commits, tags `vX.Y.Z`, and pushes — the tag triggers the GHCR +
+  Docker Hub publish workflows. `make release` does **not** touch `CHANGELOG.md`,
+  so add the new version's entry (Keep a Changelog format, top of the file)
+  **before** running it, so the release commit/tag captures the changelog. If
+  you forget, land it as a follow-up doc commit — don't re-tag.
 
 ## Tool ↔ REST mapping
 
