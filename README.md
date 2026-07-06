@@ -223,14 +223,18 @@ The `publish-dockerhub` workflow needs:
 Until both secrets exist, the `publish-dockerhub` job will fail on tag pushes
 while the GHCR `publish` job continues to work on its own.
 
-To cut a release, bump `version` in `pyproject.toml`, then tag and push:
+To cut a release, use the `release` target — it bumps `version` in
+`pyproject.toml` (and `uv.lock`), commits, tags, and pushes, which triggers both
+publish workflows:
 
 ```sh
-git commit -am "0.1.1"
-git tag v0.1.1
-git push origin main
-git push origin v0.1.1
+make release              # patch bump (default)
+make release BUMP=minor   # or minor / major
 ```
+
+The target refuses to run unless the working tree is clean and you're on `main`.
+It's equivalent to bumping the version, then `git tag vX.Y.Z && git push origin
+main vX.Y.Z` by hand.
 
 * * *
 

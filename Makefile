@@ -2,6 +2,9 @@
 
 IMAGE ?= random-mcp-server
 
+# Version bump level for `make release`: patch (default), minor, or major.
+BUMP ?= patch
+
 # Default target is help
 .PHONY: all
 all: help
@@ -16,6 +19,7 @@ help:
 	@echo "  make dev          - Launch the MCP Inspector against the server"
 	@echo "  make test         - Run the test suite (pytest)"
 	@echo "  make lock         - Refresh uv.lock"
+	@echo "  make release      - Bump version (BUMP=patch|minor|major), commit, tag, and push"
 	@echo "  make build        - Build the wheel/sdist with uv"
 	@echo "  make docker-build - Build the Docker image locally"
 	@echo "  make docker-run   - Run the server in Docker over HTTP on port 8000"
@@ -56,6 +60,25 @@ test: install
 .PHONY: lock
 lock:
 	uv lock
+
+# Bump the version in pyproject.toml (+ uv.lock), commit, tag, and push.
+# The pushed v* tag triggers the publish workflows (GHCR + Docker Hub).
+# Override the bump level with BUMP=minor or BUMP=major.
+.PHONY: release
+release:
+	@test -z "$$(git status --porcelain)" || { echo "Working tree is not clean; commit or stash first."; exit 1; }
+	@branch=$$(git rev-parse --abbrev-ref HEAD); \
+	test "$$branch" = "main" || { echo "Refusing to release from '$$branch'; switch to main."; exit 1; }
+	@echo "Bumping version ($(BUMP))..."
+	uv version --bump $(BUMP)
+	@version=$$(uv version --short); \
+	echo "Releasing v$$version..."; \
+	git add pyproject.toml uv.lock; \
+	git commit -m "Release v$$version"; \
+	git tag "v$$version"; \
+	git push origin main; \
+	git push origin "v$$version"; \
+	echo "Pushed v$$version — the publish workflows will build and push the images."
 
 # Build distributables
 .PHONY: build
