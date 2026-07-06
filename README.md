@@ -112,7 +112,12 @@ All configuration is via environment variables:
 
 * * *
 
-## Using with an MCP client
+## Using with an MCP client — local development (from source)
+
+**This section is for developers working from a checkout of this repo.** It runs
+the server straight from your local source via uv, so code changes take effect on
+the next launch. If you only have the Docker image or a remote deployment, skip to
+[Using a published image or a remote server](#using-a-published-image-or-a-remote-server).
 
 Point a stdio-based client (e.g. Claude Desktop, Claude Code) at the console
 script. Example `claude_desktop_config.json` entry using uv:
@@ -154,6 +159,102 @@ tool. The tool it invokes is shown in parentheses.
 Handy because records are **seeded and stable**: ask for a person by id, use it
 to seed a test fixture, and it stays the same until you ask Claude to reseed.
 Pass a fixed seed (e.g. "reseed with 42") when you need reproducible data.
+
+* * *
+
+## Using a published image or a remote server
+
+**This section is for consumers who are not building from source** — you have the
+published Docker image, or someone has deployed the server for you. No Python, uv,
+or checkout required. Pick the option that matches how the server reaches you.
+
+### Option A — Docker image, client launches it (stdio)
+
+The client starts a fresh container per session and talks to it over stdio. Use
+`-i` (keep stdin open) and force the stdio transport, since the image defaults to
+HTTP:
+
+```jsonc
+{
+  "mcpServers": {
+    "random": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "MCP_TRANSPORT=stdio",
+               "ghcr.io/mitchallen/random-mcp-server:latest"]
+    }
+  }
+}
+```
+
+Claude Code equivalent:
+
+```sh
+claude mcp add random -- docker run -i --rm -e MCP_TRANSPORT=stdio ghcr.io/mitchallen/random-mcp-server:latest
+```
+
+(Swap in `mitchallen/random-mcp-server:latest` to pull from Docker Hub, or pin a
+version like `:0.1.3`.)
+
+### Option B — Long-running container over HTTP (local)
+
+Start the container once (it serves HTTP by default), then point an
+HTTP-capable client at it:
+
+```sh
+docker run -d --rm -p 8000:8000 --name random-mcp ghcr.io/mitchallen/random-mcp-server:latest
+```
+
+Claude Code (native HTTP transport):
+
+```sh
+claude mcp add --transport http random http://localhost:8000/mcp/
+```
+
+For clients that only speak **stdio**, bridge to the HTTP endpoint with
+[`mcp-remote`](https://www.npmjs.com/package/mcp-remote):
+
+```jsonc
+{
+  "mcpServers": {
+    "random": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp/"]
+    }
+  }
+}
+```
+
+### Option C — Remote deployment (HTTP)
+
+If the server is hosted elsewhere, use its public URL — everything else matches
+Option B:
+
+```sh
+claude mcp add --transport http random https://random-mcp.example.com/mcp/
+```
+
+```jsonc
+{
+  "mcpServers": {
+    "random": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://random-mcp.example.com/mcp/"]
+    }
+  }
+}
+```
+
+Notes for remote use:
+
+- Prefer **HTTPS** so traffic (and any auth headers) are encrypted in transit.
+- This server ships **no authentication** (the REST server's `x-api-key` guard
+  isn't ported). If you expose it beyond localhost, put it behind a reverse proxy,
+  gateway, or network policy that enforces access — or add
+  [FastMCP auth](https://gofastmcp.com/servers/auth/authentication).
+- The endpoint path is `/mcp/` (note the trailing slash).
+
+The [example prompts](#example-prompts-claude-code) above work the same once the
+server is connected by any of these methods.
 
 * * *
 
