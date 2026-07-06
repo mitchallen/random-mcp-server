@@ -129,10 +129,14 @@ docker-up: docker-pull
 	@echo "Running $(PUBLISHED_IMAGE):$(TAG) as '$(CONTAINER)'."
 	@echo "Connect an HTTP MCP client to http://localhost:$(HTTP_PORT)/mcp/"
 
-# Smoke-test the running container: performs a real MCP `initialize` handshake
-# against the HTTP endpoint and asserts the server identifies itself.
+# Smoke-test the running container: confirms the $(CONTAINER) container is up,
+# then performs a real MCP `initialize` handshake against the HTTP endpoint and
+# asserts the server identifies itself.
 .PHONY: docker-smoke
 docker-smoke:
+	@docker ps --filter "name=^/$(CONTAINER)$$" --filter "status=running" --format '{{.Names}}' \
+	  | grep -q "^$(CONTAINER)$$" \
+	  || { echo "FAIL: container '$(CONTAINER)' is not running. Start it with 'make docker-up'."; exit 1; }
 	@echo "Smoke-testing MCP endpoint at http://localhost:$(HTTP_PORT)/mcp ..."
 	@curl -fsS -L --max-time 10 \
 	  -X POST http://localhost:$(HTTP_PORT)/mcp \
