@@ -27,6 +27,12 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
 - **Seeding:** pools are generated once at start-up from `RandomFactory`, so a
   given `id` is stable. `RANDOM_SEED` (or the `regenerate` tool's `seed` arg)
   makes output reproducible; `RANDOM_COUNT` sets pool size (default 25).
+- **`regenerate` is opt-in.** It reseeds the single process-wide pool shared by
+  every connected client, so it's gated behind `ALLOW_REGENERATE` (off by
+  default) — when unset the tool isn't registered (absent from the schema), so
+  one user can't reshuffle records out from under others on a shared instance.
+  The test suite enables it via `tests/conftest.py`; `test_feature_flags.py`
+  covers the default-off/hidden path by reloading the module with the env unset.
 - **Docker:** the image defaults to HTTP transport (`MCP_TRANSPORT=http`,
   `HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port. Runs as a
   non-root user.
@@ -39,7 +45,7 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
 | `GET /v1/<kind>`       | `list_records(kind, count?)`   |
 | `GET /v1/<kind>/count` | `count_records(kind)`          |
 | `GET /v1/<kind>/:id`   | `get_record(kind, id)` (1-based) |
-| _(restart to reseed)_  | `regenerate(seed?)`            |
+| _(restart to reseed)_  | `regenerate(seed?)` (opt-in — `ALLOW_REGENERATE`) |
 
 `kind` ∈ {`people`, `words`, `values`, `coords`, `empty`}.
 

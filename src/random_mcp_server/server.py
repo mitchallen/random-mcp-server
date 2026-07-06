@@ -8,11 +8,15 @@ plus ``server_info`` (the ``/`` health check) and ``regenerate`` (restarting the
 REST server to reseed).
 
 Environment variables (mirroring the REST server where sensible):
-  APP_NAME      display name reported by ``server_info`` (default: random-mcp-server)
-  RANDOM_COUNT  records generated per kind at start-up (default: 25)
-  RANDOM_SEED   fixed seed for reproducible pools (default: random)
-  MCP_TRANSPORT transport for ``main``: stdio (default), http, or sse
-  HOST, PORT    bind address for http/sse transports (default: 127.0.0.1:8000)
+  APP_NAME          display name reported by ``server_info`` (default: random-mcp-server)
+  RANDOM_COUNT      records generated per kind at start-up (default: 25)
+  RANDOM_SEED       fixed seed for reproducible pools (default: random)
+  ALLOW_REGENERATE  expose the ``regenerate`` tool (default: off). It reseeds the
+                    pool shared by every client on the instance, so it stays off
+                    by default to keep one user from reshuffling records out from
+                    under others on a shared deployment.
+  MCP_TRANSPORT     transport for ``main``: stdio (default), http, or sse
+  HOST, PORT        bind address for http/sse transports (default: 127.0.0.1:8000)
 """
 
 from __future__ import annotations
@@ -31,9 +35,21 @@ from fastmcp.exceptions import ToolError
 # file by path rather than as part of the installed package.
 from random_mcp_server.generators import KINDS, RandomFactory
 
+def _env_flag(name: str, default: bool = False) -> bool:
+    """Parse a boolean-ish environment variable (1/true/yes/on ⇒ True)."""
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
 APP_NAME = os.environ.get("APP_NAME", "random-mcp-server")
 DEFAULT_COUNT = int(os.environ.get("RANDOM_COUNT", "25"))
 _SEED_ENV = os.environ.get("RANDOM_SEED")
+# Off by default: `regenerate` reseeds the pool shared by every client on this
+# instance, so a shared deployment shouldn't let one caller reshuffle everyone
+# else's records. Set ALLOW_REGENERATE=1 for single-user / per-session setups.
+ALLOW_REGENERATE = _env_flag("ALLOW_REGENERATE", default=False)
 
 try:
     APP_VERSION = _pkg_version("random-mcp-server")
@@ -87,6 +103,7 @@ def server_info() -> dict[str, Any]:
         "kinds": list(KINDS),
         "count": DEFAULT_COUNT,
         "seed": _factory.seed,
+        "allow_regenerate": ALLOW_REGENERATE,
     }
 
 
@@ -120,7 +137,6 @@ def count_records(kind: Kind) -> dict[str, int]:
     return {"count": len(_pools[kind])}
 
 
-@mcp.tool
 def regenerate(seed: int | None = None) -> dict[str, Any]:
     """Reseed and rebuild every pool (like restarting the REST server).
 
@@ -129,6 +145,15 @@ def regenerate(seed: int | None = None) -> dict[str, Any]:
     _factory.reseed(seed)
     _build_pools()
     return {"status": "regenerated", "seed": _factory.seed, "count": DEFAULT_COUNT}
+
+
+# `regenerate` rebuilds the pool shared by every client on this instance, so it
+# is registered only when ALLOW_REGENERATE is set. When off, the tool is absent
+# from the schema entirely — clients can't list or call it — so one user can't
+# reshuffle records out from under others on a shared server. Enable it for
+# single-user or per-session (client-launched stdio) deployments.
+if ALLOW_REGENERATE:
+    regenerate = mcp.tool(regenerate)
 
 
 def main() -> None:

@@ -26,11 +26,14 @@ same, exposing the pool through a small set of tools parameterized by `kind`
 | `GET /v1/<kind>`          | `list_records(kind, count?)`          |
 | `GET /v1/<kind>/count`    | `count_records(kind)`                 |
 | `GET /v1/<kind>/:id`      | `get_record(kind, id)` (1-based)      |
-| _(restart to reseed)_     | `regenerate(seed?)`                   |
+| _(restart to reseed)_     | `regenerate(seed?)` — **opt-in**      |
 
 Records are **seeded at start-up**, so a given `id` is stable until you call
 `regenerate`. Pass a fixed `seed` (tool arg or `RANDOM_SEED`) for reproducible
 data.
+
+The `regenerate` tool is **disabled by default** — see
+[The `regenerate` tool is opt-in](#the-regenerate-tool-is-opt-in).
 
 ### Differences from `random-server`
 
@@ -54,6 +57,82 @@ data.
 // get_record(kind="values", id=1)  -> { "type": "values", "name": "dafe", "value": -415365907192.2176 }
 // get_record(kind="coords", id=1)  -> { "type": "coords", "latitude": 88.43647, "longitude": -93.31203 }
 ```
+
+* * *
+
+## Determinism & idempotency of records
+
+Each server **process** builds one pool of records per kind when it starts, then
+serves that pool for the life of the process. What stays stable and what changes
+follows from that:
+
+- **Within a running instance, records are idempotent.** For as long as the
+  process is up, `get_record(kind, id)` returns the same record, and
+  `list_records` returns the same pool in the same order. Ask for person `1`
+  today and it's identical on the next call — until the pool is rebuilt (below).
+- **A reboot/restart reshuffles — unless you pin a seed.** With no `RANDOM_SEED`
+  set, the factory picks a **random** seed at start-up, so restarting the server
+  (or launching a fresh container) yields a **different** pool. Set
+  `RANDOM_SEED` to a fixed value and every restart rebuilds the **same** pool, so
+  records survive reboots.
+- **A shared instance shows everyone the same records.** The pool lives in the
+  process's memory, so all clients connected to the **same** long-running
+  instance ([Option B / C](#using-a-published-image-or-a-remote-server)) see the
+  same records — no seed required for them to agree, because they're reading one
+  shared pool. Two *separate* unseeded instances (or two people each running
+  their own) will **not** match unless both pin the same `RANDOM_SEED`.
+- **Client-launched stdio gets a fresh pool per session.** When a client starts
+  the server itself ([local dev](#using-with-an-mcp-client--local-development-from-source)
+  or [Docker/stdio, Option A](#option-a--docker-image-client-launches-it-stdio)),
+  each session is its own process with its own start-up seed. Unseeded, those
+  sessions won't agree with each other; set `RANDOM_SEED` to make them line up.
+- **`regenerate` rebuilds the shared pool for everyone on that instance.**
+  `regenerate(seed=N)` is reproducible (same seed → same pool); `regenerate()`
+  with no argument picks a new random seed. Either way it **mutates the shared
+  state**, so on a multi-client instance it changes the records every other
+  connected client sees too. Because of that it is **disabled by default**
+  (see [below](#the-regenerate-tool-is-opt-in)).
+- **`server_info` reports the active `seed`.** Capture that value and feed it
+  back via `RANDOM_SEED` (at start-up) or `regenerate(seed=…)` to reproduce a
+  pool you liked later.
+
+| Scenario                                                        | Same records? |
+| --------------------------------------------------------------- | ------------- |
+| Same instance, repeated calls, no restart                       | ✅ Yes         |
+| Same long-running instance, different clients                   | ✅ Yes         |
+| After a restart / new container, **no** `RANDOM_SEED`           | ❌ No (reshuffled) |
+| After a restart / new container, **fixed** `RANDOM_SEED`        | ✅ Yes         |
+| Two separate unseeded instances                                 | ❌ No          |
+| Two instances, both pinned to the same `RANDOM_SEED`            | ✅ Yes         |
+| After `regenerate()` (no seed)                                  | ❌ No (reshuffled) |
+| After `regenerate(seed=N)` with a seed you used before          | ✅ Yes         |
+
+### The `regenerate` tool is opt-in
+
+Because `regenerate` reseeds the **one shared pool** the whole process serves,
+on a multi-user instance a single caller can reshuffle the records out from
+under everyone else — no isolation, last-writer-wins. To prevent that, the tool
+is **disabled by default**: when `ALLOW_REGENERATE` is unset the tool is not
+registered at all, so it doesn't appear in the tool list and can't be called
+(`server_info` reports `"allow_regenerate": false`).
+
+Enable it only where reseeding is safe:
+
+```sh
+ALLOW_REGENERATE=1 make run        # single-user stdio
+docker run --rm -p 8000:8000 -e ALLOW_REGENERATE=1 ghcr.io/mitchallen/random-mcp-server:latest
+```
+
+Guidance by deployment shape:
+
+- **Shared long-running instance** ([Option B / C](#using-a-published-image-or-a-remote-server)) —
+  leave it **off**. Pin `RANDOM_SEED` if you need a specific reproducible pool,
+  and treat the data as read-only. This is why the Docker image (which defaults
+  to shared HTTP) ships with `regenerate` off.
+- **Per-session / single-user** (client-launched [stdio](#option-a--docker-image-client-launches-it-stdio)
+  or [local dev](#using-with-an-mcp-client--local-development-from-source)) — each
+  client gets its own process, so reseeding only affects that caller. Safe to set
+  `ALLOW_REGENERATE=1`.
 
 * * *
 
@@ -103,12 +182,15 @@ All configuration is via environment variables:
 
 | Variable        | Default            | Purpose                                              |
 | --------------- | ------------------ | ---------------------------------------------------- |
-| `APP_NAME`      | `random-mcp-server`| Name reported by `server_info`                       |
-| `RANDOM_COUNT`  | `25`               | Records generated per kind at start-up               |
-| `RANDOM_SEED`   | _(random)_         | Fixed seed for reproducible pools                    |
-| `MCP_TRANSPORT` | `stdio`            | `stdio`, `http`, or `sse`                            |
-| `HOST`          | `127.0.0.1`        | Bind address for `http`/`sse`                        |
-| `PORT`          | `8000`             | Bind port for `http`/`sse`                           |
+| `APP_NAME`         | `random-mcp-server`| Name reported by `server_info`                       |
+| `RANDOM_COUNT`     | `25`               | Records generated per kind at start-up               |
+| `RANDOM_SEED`      | _(random)_         | Fixed seed for reproducible pools                    |
+| `ALLOW_REGENERATE` | _(off)_            | Expose the `regenerate` tool (see [below](#the-regenerate-tool-is-opt-in)) |
+| `MCP_TRANSPORT`    | `stdio`            | `stdio`, `http`, or `sse`                            |
+| `HOST`             | `127.0.0.1`        | Bind address for `http`/`sse`                        |
+| `PORT`             | `8000`             | Bind port for `http`/`sse`                           |
+
+`ALLOW_REGENERATE` accepts `1`/`true`/`yes`/`on` (case-insensitive) to enable.
 
 * * *
 
@@ -159,6 +241,10 @@ tool. The tool it invokes is shown in parentheses.
 Handy because records are **seeded and stable**: ask for a person by id, use it
 to seed a test fixture, and it stays the same until you ask Claude to reseed.
 Pass a fixed seed (e.g. "reseed with 42") when you need reproducible data.
+
+The two `regenerate` prompts only work when the server was started with
+`ALLOW_REGENERATE=1` (the [opt-in](#the-regenerate-tool-is-opt-in) flag);
+otherwise the tool isn't exposed and Claude won't have it to call.
 
 * * *
 
