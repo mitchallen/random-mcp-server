@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-07-06
+
 ### Documentation
 
 - Explain why the server has no built-in rate limiting: the workload is a pure
@@ -79,7 +81,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.0...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.1...v0.1.2
