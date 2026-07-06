@@ -242,8 +242,10 @@ Two GitHub Actions workflows live in `.github/workflows/`:
 - **`publish`** — triggered by pushing a `v*` tag. Builds a multi-platform
   (`linux/amd64`, `linux/arm64`) image and pushes it to the GitHub Container
   Registry as `ghcr.io/mitchallen/random-mcp-server` with both the version and
-  `latest` tags. It uses the built-in `GITHUB_TOKEN`, so no extra secrets are
-  needed.
+  `latest` tags, then runs `make docker-test` against the just-published image as
+  a post-publish smoke check (the job fails if the released image doesn't answer
+  an MCP `initialize`). It uses the built-in `GITHUB_TOKEN`, so no extra secrets
+  are needed.
 - **`publish-dockerhub`** — also triggered by a `v*` tag. Pushes the same
   multi-platform image to Docker Hub as `mitchallen/random-mcp-server` and syncs
   this README to the Docker Hub repo description. Requires two repository

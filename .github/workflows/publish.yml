@@ -33,3 +33,9 @@ jobs:
             -t ${image}:${tag} \
             -t ${image}:latest \
             --push .
+
+      - name: Smoke-test the published image
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          tag=${tag:1}
+          make docker-test REGISTRY=ghcr.io/${GITHUB_REPOSITORY_OWNER} TAG=${tag}
