@@ -341,7 +341,28 @@ Notes for remote use:
   isn't ported). If you expose it beyond localhost, put it behind a reverse proxy,
   gateway, or network policy that enforces access — or add
   [FastMCP auth](https://gofastmcp.com/servers/auth/authentication).
+- **No built-in rate limiting** — by design (see below).
 - The endpoint path is `/mcp/` (note the trailing slash).
+
+### Why there's no built-in rate limiting
+
+FastMCP ships rate-limiting middleware and it would be a few lines to wire in,
+but this server deliberately doesn't:
+
+- **Nothing expensive to protect.** Every tool is an in-memory lookup against a
+  pool built once at start-up — no database, external API, or real compute cost.
+  Rate limiting shields scarce resources; this workload has none.
+- **It only makes sense on the shared HTTP transport.** Over stdio each client
+  launches its own process, so throttling your own single-user server is moot.
+- **Without auth there's no per-client identity to key on.** In-memory limiting
+  would fall back to a *global* limit, which recreates the shared-instance
+  fairness problem (one noisy client starves everyone) rather than solving it.
+  It also wouldn't coordinate across replicas behind a load balancer.
+- **The edge is the right layer.** For a public deployment, enforce rate limits
+  at the same reverse proxy / gateway that provides auth and TLS (nginx,
+  Cloudflare, an API gateway) — it coordinates across replicas and can key on
+  authenticated identity. App-level limiting becomes worthwhile mainly once you
+  add auth (so `get_client_id` is meaningful).
 
 The [example prompts](#example-prompts-claude-code) above work the same once the
 server is connected by any of these methods.
