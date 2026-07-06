@@ -1,4 +1,4 @@
-name: test
+name: bdd
 on:
   push:
     branches: [ main ]
@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  unit:
+  bdd:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -19,5 +19,5 @@ jobs:
       - name: Sync dependencies
         run: uv sync --frozen
 
-      - name: Run unit tests
-        run: uv run pytest --ignore=tests/test_bdd.py
+      - name: Run BDD scenarios
+        run: uv run pytest tests/test_bdd.py

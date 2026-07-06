@@ -1,6 +1,6 @@
 # random-mcp-server
 
-[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/random-mcp-server?sort=semver&label=version)](https://github.com/mitchallen/random-mcp-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/random-mcp-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![test](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml)
+[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/random-mcp-server?sort=semver&label=version)](https://github.com/mitchallen/random-mcp-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/random-mcp-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![test](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml) [![bdd](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml)
 
 An [MCP](https://modelcontextprotocol.io) server that returns random JSON
 things — people, words, values, coordinates, and an always-empty list. It is a
@@ -237,10 +237,11 @@ make docker-run          # serves http on localhost:8000
 
 Two GitHub Actions workflows live in `.github/workflows/`:
 
-- **`test`** — runs on every push/PR to `main`. A matrix runs the **unit** tests
-  and the **BDD** scenarios as two separate jobs (`test (unit)` and `test (bdd)`),
-  each doing `uv sync --frozen` then its own `pytest` selection, so they pass or
-  fail independently.
+- **`test`** — runs on every push/PR to `main`: the **unit** suite
+  (`uv sync --frozen` then `pytest --ignore=tests/test_bdd.py`).
+- **`bdd`** — runs on every push/PR to `main` in its own workflow: the
+  **pytest-bdd** scenarios (`pytest tests/test_bdd.py`), so they pass or fail
+  and report (and badge) independently of the unit suite.
 - **`publish`** — triggered by pushing a `v*` tag. Builds a multi-platform
   (`linux/amd64`, `linux/arm64`) image and pushes it to the GitHub Container
   Registry as `ghcr.io/mitchallen/random-mcp-server` with both the version and
