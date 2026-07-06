@@ -306,6 +306,23 @@ main vX.Y.Z` by hand.
   with `--frozen`. Whenever you change dependencies in `pyproject.toml`, run
   `make lock` (or `uv lock`) to refresh the lockfile and commit it.
 
+### FastMCP integration notes
+
+Two non-obvious adjustments were needed so the FastMCP tooling reports the
+project correctly:
+
+- **Explicit `version`.** `FastMCP(...)` is constructed with
+  `version=APP_VERSION` (read from the installed package metadata). Without it,
+  FastMCP falls back to reporting *its own framework version* in the MCP
+  `initialize` handshake and in `make inspect` / `fastmcp inspect` — so the
+  server would advertise e.g. `3.4.3` instead of the package's `0.1.2`.
+- **Absolute import in `server.py`.** The module imports its siblings as
+  `from random_mcp_server.generators import ...` rather than `from .generators`.
+  The FastMCP CLI (`make inspect`, `fastmcp list/call`) loads `server.py` *by
+  path* rather than as part of the installed package, and a relative import
+  fails that way with `attempted relative import with no known parent package`.
+  The absolute form loads correctly both by path and as a package module.
+
 * * *
 
 ## License

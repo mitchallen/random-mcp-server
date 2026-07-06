@@ -65,6 +65,9 @@ def _uptime_hhmmss() -> str:
 
 mcp = FastMCP(
     name=APP_NAME,
+    # Report the package version; without this FastMCP falls back to its own
+    # framework version in the MCP handshake / `fastmcp inspect`.
+    version=APP_VERSION,
     instructions=(
         "Returns random JSON things. Use list_records / get_record / count_records "
         "with a kind of people, words, values, coords, or empty. Records are seeded "
