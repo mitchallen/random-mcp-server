@@ -247,9 +247,10 @@ Two GitHub Actions workflows live in `.github/workflows/`:
   an MCP `initialize`). It uses the built-in `GITHUB_TOKEN`, so no extra secrets
   are needed.
 - **`publish-dockerhub`** — also triggered by a `v*` tag. Pushes the same
-  multi-platform image to Docker Hub as `mitchallen/random-mcp-server` and syncs
-  this README to the Docker Hub repo description. Requires two repository
-  secrets and a pre-created Docker Hub repository (see below).
+  multi-platform image to Docker Hub as `mitchallen/random-mcp-server`, runs the
+  same `make docker-test` post-publish smoke check against it, and syncs this
+  README to the Docker Hub repo description. Requires two repository secrets and
+  a pre-created Docker Hub repository (see below).
 
 ### Docker Hub setup
 

@@ -31,6 +31,12 @@ jobs:
             -t ${image}:latest \
             --push .
 
+      - name: Smoke-test the published image
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          tag=${tag:1}
+          make docker-test REGISTRY=docker.io/mitchallen TAG=${tag}
+
       - name: Update Docker Hub README
         uses: peter-evans/dockerhub-description@v5
         with:
