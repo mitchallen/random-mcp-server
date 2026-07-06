@@ -292,9 +292,11 @@ main vX.Y.Z` by hand.
   - `test_generators.py` / `test_server.py` — plain pytest unit tests.
   - `test_bdd.py` + `tests/features/*.feature` — a **pytest-bdd** layer that
     mirrors random-server's Cucumber features (Gherkin scenarios for each record
-    kind and the server info check). The `/v1/<kind>` endpoints map to the
-    `list_records` tool; `auth.feature` is not mirrored since the `x-api-key`
-    guard isn't ported.
+    kind and the server info check), plus scenarios for `get_record` (by id,
+    stability, out-of-range), `count_records`, and `regenerate` (seed reporting
+    and reproducibility). The `/v1/<kind>` routes map to the `list_records` /
+    `get_record` / `count_records` tools; `auth.feature` is not mirrored since
+    the `x-api-key` guard isn't ported.
 - `make build` produces a wheel/sdist via `uv build`.
 - **Dependencies:** `uv.lock` is committed and the Docker build installs from it
   with `--frozen`. Whenever you change dependencies in `pyproject.toml`, run

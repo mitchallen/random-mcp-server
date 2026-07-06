@@ -64,6 +64,34 @@ def list_kind(context, kind):
     context["result"] = _call("list_records", kind=kind)
 
 
+@when(parsers.parse('the "{kind}" records are counted'))
+def count_kind(context, kind):
+    context["result"] = _call("count_records", kind=kind)
+
+
+@when(parsers.parse('record {record_id:d} of "{kind}" is fetched'))
+def fetch_record(context, record_id, kind):
+    context["first"] = _call("get_record", kind=kind, id=record_id)
+
+
+@when(parsers.parse('record {record_id:d} of "{kind}" is fetched again'))
+def fetch_record_again(context, record_id, kind):
+    context["again"] = _call("get_record", kind=kind, id=record_id)
+
+
+@when(parsers.parse('record {record_id:d} of "{kind}" is fetched expecting an error'))
+def fetch_record_expecting_error(context, record_id, kind):
+    try:
+        _call("get_record", kind=kind, id=record_id)
+    except Exception as exc:  # captured for the assertion in the Then step
+        context["error"] = exc
+
+
+@when(parsers.parse("the records are regenerated with seed {seed:d}"))
+def regenerate_with_seed(context, seed):
+    context["result"] = _call("regenerate", seed=seed)
+
+
 # --- Then ------------------------------------------------------------------
 
 
@@ -109,3 +137,34 @@ def each_item_property_numeric(context, prop):
 def each_item_property_nonempty_string(context, prop):
     for item in context["result"]:
         assert isinstance(item[prop], str) and item[prop] != ""
+
+
+@then(parsers.parse('the "{prop}" property of the result should be {value:d}'))
+def result_property_equals_int(context, prop, value):
+    assert context["result"][prop] == value
+
+
+@then(parsers.parse('the fetched record should have "{prop}" equal to "{value}"'))
+def fetched_record_property_equals(context, prop, value):
+    assert context["first"][prop] == value
+
+
+@then("both fetched records should be equal")
+def both_fetched_records_equal(context):
+    assert context["first"] == context["again"]
+
+
+@then("an out-of-range error should be raised")
+def out_of_range_error_raised(context):
+    assert "error" in context, "expected an error to be raised"
+    assert "out of range" in str(context["error"])
+
+
+@then("the count should equal the configured pool size")
+def count_equals_configured(context):
+    assert context["result"]["count"] == server.DEFAULT_COUNT
+
+
+@then(parsers.parse("the count should be {expected:d}"))
+def count_should_be(context, expected):
+    assert context["result"]["count"] == expected
