@@ -25,6 +25,7 @@ help:
 	@echo "  make run          - Run the MCP server over stdio"
 	@echo "  make run-http     - Run the MCP server over streamable HTTP (PORT, default 8000)"
 	@echo "  make dev          - Launch the MCP Inspector against the server"
+	@echo "  make inspect      - Print a server summary (name, version, tools) via fastmcp"
 	@echo "  make test         - Run the test suite (pytest)"
 	@echo "  make lock         - Refresh uv.lock"
 	@echo "  make release      - Bump version (BUMP=patch|minor|major), commit, tag, and push"
@@ -63,6 +64,11 @@ run-http: install
 .PHONY: dev
 dev: install
 	uv run fastmcp dev src/random_mcp_server/server.py
+
+# Print a summary of the server (name, version, tools) via the FastMCP CLI
+.PHONY: inspect
+inspect: install
+	uv run fastmcp inspect src/random_mcp_server/server.py
 
 # Run tests
 .PHONY: test

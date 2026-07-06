@@ -88,10 +88,11 @@ make run-http            # PORT defaults to 8000
 PORT=9000 make run-http
 ```
 
-### Interactive Inspector
+### Inspect the server
 
 ```sh
-make dev                 # launches the FastMCP Inspector
+make inspect             # print a summary: name, version, tool count
+make dev                 # launch the interactive FastMCP Inspector (web UI)
 ```
 
 * * *

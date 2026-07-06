@@ -26,7 +26,10 @@ from typing import Any, Literal
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
-from .generators import KINDS, RandomFactory
+# Absolute import (not `from .generators`) so the module also loads when the
+# FastMCP CLI (`fastmcp inspect`/`list`/`call`, i.e. `make inspect`) imports this
+# file by path rather than as part of the installed package.
+from random_mcp_server.generators import KINDS, RandomFactory
 
 APP_NAME = os.environ.get("APP_NAME", "random-mcp-server")
 DEFAULT_COUNT = int(os.environ.get("RANDOM_COUNT", "25"))
