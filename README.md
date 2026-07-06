@@ -107,6 +107,10 @@ follows from that:
 | After `regenerate()` (no seed)                                  | ❌ No (reshuffled) |
 | After `regenerate(seed=N)` with a seed you used before          | ✅ Yes         |
 
+The two `regenerate` rows assume `ALLOW_REGENERATE` is set; otherwise the tool is
+unavailable ([opt-in](#the-regenerate-tool-is-opt-in)) and only a restart rebuilds
+the pool.
+
 ### The `regenerate` tool is opt-in
 
 Because `regenerate` reseeds the **one shared pool** the whole process serves,
