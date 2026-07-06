@@ -133,6 +133,27 @@ With Claude Code:
 claude mcp add random -- uv run --directory "$PWD" random-mcp-server
 ```
 
+Confirm it's connected with `claude mcp list` (or `/mcp` inside a session).
+
+### Example prompts (Claude Code)
+
+Once the server is added, just ask in plain language — Claude picks the right
+tool. The tool it invokes is shown in parentheses.
+
+- "Is the random server up? What version is it?" → (`server_info`)
+- "Give me 3 random people." → (`list_records` with `kind="people"`, `count=3`)
+- "Show me the first random person." → (`get_record` with `kind="people"`, `id=1`)
+- "How many random coordinates are available?" → (`count_records` with `kind="coords"`)
+- "List all the random words." → (`list_records` with `kind="words"`)
+- "Grab 5 random coordinates and drop them on a map." → (`list_records` with `kind="coords"`, `count=5`)
+- "Reseed the random data with seed 42, then show me person 1." → (`regenerate` with `seed=42`, then `get_record`)
+- "Reshuffle all the random records." → (`regenerate`)
+- "Get random value number 4." → (`get_record` with `kind="values"`, `id=4`)
+
+Handy because records are **seeded and stable**: ask for a person by id, use it
+to seed a test fixture, and it stays the same until you ask Claude to reseed.
+Pass a fixed seed (e.g. "reseed with 42") when you need reproducible data.
+
 * * *
 
 ## Docker
