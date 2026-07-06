@@ -157,6 +157,25 @@ Two GitHub Actions workflows live in `.github/workflows/`:
   Registry as `ghcr.io/mitchallen/random-mcp-server` with both the version and
   `latest` tags. It uses the built-in `GITHUB_TOKEN`, so no extra secrets are
   needed.
+- **`publish-dockerhub`** — also triggered by a `v*` tag. Pushes the same
+  multi-platform image to Docker Hub as `mitchallen/random-mcp-server` and syncs
+  this README to the Docker Hub repo description. Requires two repository
+  secrets and a pre-created Docker Hub repository (see below).
+
+### Docker Hub setup
+
+The `publish-dockerhub` workflow needs:
+
+1. A Docker Hub repository named `mitchallen/random-mcp-server`.
+2. Two repository secrets — set them with the GitHub CLI:
+
+   ```sh
+   gh secret set DOCKERHUB_USERNAME --repo mitchallen/random-mcp-server
+   gh secret set DOCKERHUB_TOKEN    --repo mitchallen/random-mcp-server   # a Docker Hub access token
+   ```
+
+Until both secrets exist, the `publish-dockerhub` job will fail on tag pushes
+while the GHCR `publish` job continues to work on its own.
 
 To cut a release, bump `version` in `pyproject.toml`, then tag and push:
 
