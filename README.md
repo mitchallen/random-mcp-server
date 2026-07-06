@@ -186,6 +186,21 @@ docker run --rm -p 8000:8000 --name random-mcp ghcr.io/mitchallen/random-mcp-ser
 
 Then connect an HTTP MCP client to `http://localhost:8000/mcp/`.
 
+### Test a published release with make
+
+Convenience targets pull and run the **published** image in your local Docker
+environment — handy for smoke-testing a release without a local build:
+
+```sh
+make docker-up                 # pull + run ghcr.io/mitchallen latest, detached
+make docker-logs               # follow the container logs
+make docker-down               # stop it
+
+make docker-up TAG=0.1.1                         # pin a version
+make docker-up REGISTRY=docker.io/mitchallen     # pull from Docker Hub instead
+make docker-up HTTP_PORT=9000                    # publish on a different host port
+```
+
 ### Configure at runtime
 
 Pass any of the [configuration](#configuration) variables with `-e`:

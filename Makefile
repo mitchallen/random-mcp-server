@@ -5,6 +5,14 @@ IMAGE ?= random-mcp-server
 # Version bump level for `make release`: patch (default), minor, or major.
 BUMP ?= patch
 
+# Published image coordinates for pulling/running release images locally.
+# Switch registries with e.g. REGISTRY=docker.io/mitchallen, pin with TAG=0.1.1.
+REGISTRY ?= ghcr.io/mitchallen
+TAG ?= latest
+PUBLISHED_IMAGE ?= $(REGISTRY)/random-mcp-server
+CONTAINER ?= random-mcp
+HTTP_PORT ?= 8000
+
 # Default target is help
 .PHONY: all
 all: help
@@ -22,7 +30,11 @@ help:
 	@echo "  make release      - Bump version (BUMP=patch|minor|major), commit, tag, and push"
 	@echo "  make build        - Build the wheel/sdist with uv"
 	@echo "  make docker-build - Build the Docker image locally"
-	@echo "  make docker-run   - Run the server in Docker over HTTP on port 8000"
+	@echo "  make docker-run   - Run the locally-built image over HTTP on port 8000"
+	@echo "  make docker-pull  - Pull the published image (REGISTRY, TAG)"
+	@echo "  make docker-up    - Pull and run the published image detached (HTTP_PORT, TAG)"
+	@echo "  make docker-logs  - Follow logs of the running test container"
+	@echo "  make docker-down  - Stop the running test container"
 	@echo "  make scan         - Scan the Docker image for vulnerabilities (Trivy)"
 	@echo "  make docker-rm    - Remove the Docker image"
 	@echo "  make docker-prune - Prune unused Docker data"
@@ -92,10 +104,40 @@ docker-build:
 	@echo "Building Docker image locally..."
 	docker build -t $(IMAGE) .
 
-# Run the container over HTTP on port 8000
+# Run the locally-built image over HTTP on port 8000
 .PHONY: docker-run
 docker-run:
 	docker run --rm -p 8000:8000 --name $(IMAGE) $(IMAGE)
+
+# --- Published image (for local testing of a release) --------------------
+
+# Pull the published image from the registry.
+#   make docker-pull                              # ghcr.io/mitchallen, latest
+#   make docker-pull REGISTRY=docker.io/mitchallen TAG=0.1.1
+.PHONY: docker-pull
+docker-pull:
+	@echo "Pulling $(PUBLISHED_IMAGE):$(TAG)..."
+	docker pull $(PUBLISHED_IMAGE):$(TAG)
+
+# Pull and run the published image detached over HTTP for local testing.
+# Override the host port with HTTP_PORT=9000.
+.PHONY: docker-up
+docker-up: docker-pull
+	-docker rm -f $(CONTAINER) 2>/dev/null || true
+	docker run -d --rm -p $(HTTP_PORT):8000 --name $(CONTAINER) $(PUBLISHED_IMAGE):$(TAG)
+	@echo "Running $(PUBLISHED_IMAGE):$(TAG) as '$(CONTAINER)'."
+	@echo "Connect an HTTP MCP client to http://localhost:$(HTTP_PORT)/mcp/"
+
+# Follow logs of the running test container.
+.PHONY: docker-logs
+docker-logs:
+	docker logs -f $(CONTAINER)
+
+# Stop the running test container (started with --rm, so it is removed too).
+.PHONY: docker-down
+docker-down:
+	@echo "Stopping $(CONTAINER)..."
+	-docker stop $(CONTAINER)
 
 # Scan container for vulnerabilities using Trivy
 .PHONY: scan
