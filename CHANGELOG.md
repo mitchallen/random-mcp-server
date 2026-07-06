@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+
+- Explain why the server has no built-in rate limiting: the workload is a pure
+  in-memory lookup (nothing expensive to protect), limiting only applies to the
+  shared HTTP transport, without auth there's no per-client identity to key on
+  (a global limit would recreate the shared-instance fairness problem and
+  wouldn't coordinate across replicas), and the reverse proxy / gateway is the
+  right layer for it.
+
 ## [0.2.0] - 2026-07-06
 
 ### Changed
@@ -68,6 +79,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/mitchallen/random-mcp-server/compare/v0.1.1...v0.1.2
