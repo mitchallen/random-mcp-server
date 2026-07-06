@@ -258,6 +258,24 @@ server is connected by any of these methods.
 
 * * *
 
+## Verified client setups
+
+The setups below were exercised against the published image (`:0.1.3`) with a
+real client — connect, `initialize`, list tools, and call a tool — not just
+assumed. Legend: ✅ connected end-to-end · ☑️ server/endpoint proven, that exact
+client wiring not run here.
+
+| Setup | Transport | How it was verified | Status |
+| ----- | --------- | ------------------- | ------ |
+| Docker image, client-launched ([Option A](#option-a--docker-image-client-launches-it-stdio)) | stdio | Piped an MCP `initialize` into `docker run -i -e MCP_TRANSPORT=stdio …`; got a valid response reporting `v0.1.3`. | ✅ |
+| Long-running HTTP container ([Option B](#option-b--long-running-container-over-http-local)) | HTTP | FastMCP network client against `http://localhost:8000/mcp/` (listed all 5 tools, called `get_record`/`count_records`). | ✅ |
+| Long-running HTTP container, Claude Code | HTTP | `claude mcp add --transport http …` → `claude mcp list` reported **✔ Connected**. | ✅ |
+| Local dev, console script ([from source](#using-with-an-mcp-client--local-development-from-source)) | stdio | Server proven through the in-memory FastMCP client and the test suite; the `uv run` stdio launch is the same entry point. | ☑️ |
+| Remote deployment ([Option C](#option-c--remote-deployment-http)) | HTTP | Identical to Option B but with a public URL; the HTTP endpoint is proven, a hosted instance was not stood up. | ☑️ |
+| stdio-only client via `mcp-remote` bridge | HTTP (bridged) | Documented from standard `mcp-remote` usage; not run here. | ☑️ |
+
+* * *
+
 ## Docker
 
 Published multi-platform (`linux/amd64`, `linux/arm64`) images are available
