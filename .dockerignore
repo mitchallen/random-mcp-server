@@ -8,6 +8,9 @@ dist
 *.egg-info
 .DS_Store
 .claude
+.github
+# README.md is required at build time (hatchling project readme); keep it.
 *.md
+!README.md
 Dockerfile
 .dockerignore

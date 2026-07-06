@@ -146,6 +146,29 @@ Then connect an HTTP MCP client to `http://localhost:8000/mcp/`.
 
 * * *
 
+## CI / Publish
+
+Two GitHub Actions workflows live in `.github/workflows/`:
+
+- **`test`** — runs on every push/PR to `main`: `uv sync --frozen` then `uv run
+  pytest`.
+- **`publish`** — triggered by pushing a `v*` tag. Builds a multi-platform
+  (`linux/amd64`, `linux/arm64`) image and pushes it to the GitHub Container
+  Registry as `ghcr.io/mitchallen/random-mcp-server` with both the version and
+  `latest` tags. It uses the built-in `GITHUB_TOKEN`, so no extra secrets are
+  needed.
+
+To cut a release, bump `version` in `pyproject.toml`, then tag and push:
+
+```sh
+git commit -am "0.1.1"
+git tag v0.1.1
+git push origin main
+git push origin v0.1.1
+```
+
+* * *
+
 ## Development
 
 - Source: `src/random_mcp_server/`
