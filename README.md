@@ -135,14 +135,60 @@ claude mcp add random -- uv run --directory "$PWD" random-mcp-server
 
 ## Docker
 
-The image runs over HTTP by default so it's reachable on a published port.
+Published multi-platform (`linux/amd64`, `linux/arm64`) images are available
+from two registries:
+
+- **GitHub Container Registry:** `ghcr.io/mitchallen/random-mcp-server`
+- **Docker Hub:** `mitchallen/random-mcp-server`
+
+The image runs the server over **streamable HTTP** by default (`MCP_TRANSPORT=http`,
+`HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port.
+
+### Pull the image
 
 ```sh
-make docker-build
-make docker-run          # serves http on localhost:8000
+docker pull ghcr.io/mitchallen/random-mcp-server:latest
+# or from Docker Hub
+docker pull mitchallen/random-mcp-server:latest
+```
+
+Both registries also publish version tags (e.g. `:0.1.0`); prefer a pinned
+version over `:latest` for reproducible deployments.
+
+### Run the container
+
+```sh
+docker run --rm -p 8000:8000 --name random-mcp ghcr.io/mitchallen/random-mcp-server:latest
 ```
 
 Then connect an HTTP MCP client to `http://localhost:8000/mcp/`.
+
+### Configure at runtime
+
+Pass any of the [configuration](#configuration) variables with `-e`:
+
+```sh
+docker run --rm -p 9000:9000 \
+  -e PORT=9000 \
+  -e APP_NAME=my-random \
+  -e RANDOM_COUNT=50 \
+  -e RANDOM_SEED=42 \
+  ghcr.io/mitchallen/random-mcp-server:latest
+```
+
+To run over stdio inside the container instead (e.g. when another process
+attaches to it), override the transport:
+
+```sh
+docker run --rm -i -e MCP_TRANSPORT=stdio ghcr.io/mitchallen/random-mcp-server:latest
+```
+
+### Build locally
+
+```sh
+make docker-build        # docker build -t random-mcp-server .
+make docker-run          # serves http on localhost:8000
+```
 
 * * *
 
