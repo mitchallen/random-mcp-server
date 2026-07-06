@@ -192,6 +192,8 @@ Convenience targets pull and run the **published** image in your local Docker
 environment — handy for smoke-testing a release without a local build:
 
 ```sh
+make docker-test               # up + smoke + down in one shot (exits non-zero on failure)
+
 make docker-up                 # pull + run ghcr.io/mitchallen latest, detached
 make docker-smoke              # MCP `initialize` handshake — passes if the server responds
 make docker-logs               # follow the container logs

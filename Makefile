@@ -34,6 +34,7 @@ help:
 	@echo "  make docker-pull  - Pull the published image (REGISTRY, TAG)"
 	@echo "  make docker-up    - Pull and run the published image detached (HTTP_PORT, TAG)"
 	@echo "  make docker-smoke - Smoke-test the running container's MCP endpoint (HTTP_PORT)"
+	@echo "  make docker-test  - Up + smoke + down in one shot (CI gate for a published image)"
 	@echo "  make docker-logs  - Follow logs of the running test container"
 	@echo "  make docker-down  - Stop the running test container"
 	@echo "  make scan         - Scan the Docker image for vulnerabilities (Trivy)"
@@ -157,6 +158,21 @@ docker-logs:
 docker-down:
 	@echo "Stopping $(CONTAINER)..."
 	-docker stop $(CONTAINER)
+
+# End-to-end container check: up -> wait for readiness -> smoke -> down.
+# Always tears down (even if the smoke test fails) and exits with the smoke
+# test's status, so it works as a one-shot CI gate for a published image.
+.PHONY: docker-test
+docker-test:
+	@$(MAKE) --no-print-directory docker-up
+	@printf "Waiting for MCP endpoint on port $(HTTP_PORT)"; \
+	for i in $$(seq 1 30); do \
+	  if curl -sS -o /dev/null --max-time 2 http://localhost:$(HTTP_PORT)/mcp 2>/dev/null; then break; fi; \
+	  printf "."; sleep 1; \
+	done; echo
+	@$(MAKE) --no-print-directory docker-smoke; status=$$?; \
+	  $(MAKE) --no-print-directory docker-down; \
+	  exit $$status
 
 # Scan container for vulnerabilities using Trivy
 .PHONY: scan
