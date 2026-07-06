@@ -24,6 +24,7 @@ random-mcp-server = "random_mcp_server.server:main"
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
+    "pytest-bdd>=7.0.0",
 ]
 
 [build-system]

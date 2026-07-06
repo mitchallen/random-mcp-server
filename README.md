@@ -287,7 +287,14 @@ main vX.Y.Z` by hand.
 - Source: `src/random_mcp_server/`
   - `generators.py` — deterministic, seedable record builders (`RandomFactory`)
   - `server.py` — FastMCP tools + entry point (`main`)
-- Tests: `tests/` (`pytest`, driven through an in-memory FastMCP client)
+- Tests: `tests/`, run with `make test` (`uv run pytest`), driven through an
+  in-memory FastMCP client. Two layers:
+  - `test_generators.py` / `test_server.py` — plain pytest unit tests.
+  - `test_bdd.py` + `tests/features/*.feature` — a **pytest-bdd** layer that
+    mirrors random-server's Cucumber features (Gherkin scenarios for each record
+    kind and the server info check). The `/v1/<kind>` endpoints map to the
+    `list_records` tool; `auth.feature` is not mirrored since the `x-api-key`
+    guard isn't ported.
 - `make build` produces a wheel/sdist via `uv build`.
 - **Dependencies:** `uv.lock` is committed and the Docker build installs from it
   with `--frozen`. Whenever you change dependencies in `pyproject.toml`, run
