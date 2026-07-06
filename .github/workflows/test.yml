@@ -8,6 +8,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    name: test (${{ matrix.suite }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Unit tests: everything except the BDD module.
+          - suite: unit
+            args: --ignore=tests/test_bdd.py
+          # BDD scenarios (pytest-bdd) run on their own.
+          - suite: bdd
+            args: tests/test_bdd.py
     steps:
       - uses: actions/checkout@v5
 
@@ -19,5 +30,5 @@ jobs:
       - name: Sync dependencies
         run: uv sync --frozen
 
-      - name: Run tests
-        run: uv run pytest
+      - name: Run ${{ matrix.suite }} tests
+        run: uv run pytest ${{ matrix.args }}

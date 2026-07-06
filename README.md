@@ -237,8 +237,10 @@ make docker-run          # serves http on localhost:8000
 
 Two GitHub Actions workflows live in `.github/workflows/`:
 
-- **`test`** — runs on every push/PR to `main`: `uv sync --frozen` then `uv run
-  pytest`.
+- **`test`** — runs on every push/PR to `main`. A matrix runs the **unit** tests
+  and the **BDD** scenarios as two separate jobs (`test (unit)` and `test (bdd)`),
+  each doing `uv sync --frozen` then its own `pytest` selection, so they pass or
+  fail independently.
 - **`publish`** — triggered by pushing a `v*` tag. Builds a multi-platform
   (`linux/amd64`, `linux/arm64`) image and pushes it to the GitHub Container
   Registry as `ghcr.io/mitchallen/random-mcp-server` with both the version and
