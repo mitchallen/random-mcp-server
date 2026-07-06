@@ -1,5 +1,7 @@
 # random-mcp-server
 
+[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/random-mcp-server?sort=semver&label=version)](https://github.com/mitchallen/random-mcp-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/random-mcp-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![test](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml)
+
 An [MCP](https://modelcontextprotocol.io) server that returns random JSON
 things — people, words, values, coordinates, and an always-empty list. It is a
 Python / [FastMCP](https://gofastmcp.com) adaptation of the Node/Express
