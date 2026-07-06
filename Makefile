@@ -33,6 +33,7 @@ help:
 	@echo "  make docker-run   - Run the locally-built image over HTTP on port 8000"
 	@echo "  make docker-pull  - Pull the published image (REGISTRY, TAG)"
 	@echo "  make docker-up    - Pull and run the published image detached (HTTP_PORT, TAG)"
+	@echo "  make docker-smoke - Smoke-test the running container's MCP endpoint (HTTP_PORT)"
 	@echo "  make docker-logs  - Follow logs of the running test container"
 	@echo "  make docker-down  - Stop the running test container"
 	@echo "  make scan         - Scan the Docker image for vulnerabilities (Trivy)"
@@ -127,6 +128,20 @@ docker-up: docker-pull
 	docker run -d --rm -p $(HTTP_PORT):8000 --name $(CONTAINER) $(PUBLISHED_IMAGE):$(TAG)
 	@echo "Running $(PUBLISHED_IMAGE):$(TAG) as '$(CONTAINER)'."
 	@echo "Connect an HTTP MCP client to http://localhost:$(HTTP_PORT)/mcp/"
+
+# Smoke-test the running container: performs a real MCP `initialize` handshake
+# against the HTTP endpoint and asserts the server identifies itself.
+.PHONY: docker-smoke
+docker-smoke:
+	@echo "Smoke-testing MCP endpoint at http://localhost:$(HTTP_PORT)/mcp ..."
+	@curl -fsS -L --max-time 10 \
+	  -X POST http://localhost:$(HTTP_PORT)/mcp \
+	  -H "Content-Type: application/json" \
+	  -H "Accept: application/json, text/event-stream" \
+	  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"make-smoke","version":"0"}}}' \
+	  | grep -q '"name":"random-mcp-server"' \
+	  && echo "PASS: server responded to MCP initialize" \
+	  || { echo "FAIL: no valid MCP initialize response on port $(HTTP_PORT). Is 'make docker-up' running?"; exit 1; }
 
 # Follow logs of the running test container.
 .PHONY: docker-logs

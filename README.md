@@ -193,6 +193,7 @@ environment — handy for smoke-testing a release without a local build:
 
 ```sh
 make docker-up                 # pull + run ghcr.io/mitchallen latest, detached
+make docker-smoke              # MCP `initialize` handshake — passes if the server responds
 make docker-logs               # follow the container logs
 make docker-down               # stop it
 
