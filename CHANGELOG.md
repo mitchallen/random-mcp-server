@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-07-08
+
 ### Documentation
 
 - Correct the HTTP endpoint path in the README: the streamable-HTTP endpoint is
