@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Documentation
+
+- Correct the HTTP endpoint path in the README: the streamable-HTTP endpoint is
+  `/mcp` (no trailing slash). FastMCP 3.4.3 serves it there and 307-redirects
+  `/mcp/` to it, so the examples and the "Notes for remote use" bullet now point
+  at `/mcp` to skip the redirect round-trip (and work with clients that don't
+  follow redirects).
+
 ## [0.2.2] - 2026-07-08
 
 ### Documentation
