@@ -262,9 +262,10 @@ or checkout required. Pick the option that matches how the server reaches you.
 
 The client starts a fresh container per session and talks to it over stdio. Use
 `-i` (keep stdin open) and force the stdio transport, since the image defaults to
-HTTP:
+HTTP. The image is published to two registries, so pick one:
 
 ```jsonc
+// GitHub Container Registry (GHCR)
 {
   "mcpServers": {
     "random": {
@@ -276,7 +277,20 @@ HTTP:
 }
 ```
 
-Claude Code equivalent — the image is published to two registries, so pick one:
+```jsonc
+// Docker Hub
+{
+  "mcpServers": {
+    "random": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "MCP_TRANSPORT=stdio",
+               "mitchallen/random-mcp-server:latest"]
+    }
+  }
+}
+```
+
+Claude Code equivalent — again, pick a registry:
 
 ```sh
 # GitHub Container Registry (GHCR)
