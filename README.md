@@ -334,14 +334,14 @@ Claude Code (native HTTP transport) — the client connects over HTTP, so the
 command is the same regardless of which registry you pulled from:
 
 ```sh
-claude mcp add --transport http random http://localhost:8000/mcp/
+claude mcp add --transport http random http://localhost:8000/mcp
 ```
 
 Add `--scope user` (`-s user`) to register it for **every** project on your
 machine instead of just the current one:
 
 ```sh
-claude mcp add --scope user --transport http random http://localhost:8000/mcp/
+claude mcp add --scope user --transport http random http://localhost:8000/mcp
 ```
 
 For clients that only speak **stdio**, bridge to the HTTP endpoint with
@@ -352,7 +352,7 @@ For clients that only speak **stdio**, bridge to the HTTP endpoint with
   "mcpServers": {
     "random": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp/"]
+      "args": ["-y", "mcp-remote", "http://localhost:8000/mcp"]
     }
   }
 }
@@ -365,13 +365,13 @@ Option B. There's no image to pull here (the host already runs it, from
 whichever registry they chose), so registry choice doesn't apply on your side:
 
 ```sh
-claude mcp add --transport http random https://random-mcp.example.com/mcp/
+claude mcp add --transport http random https://random-mcp.example.com/mcp
 ```
 
 Add `--scope user` (`-s user`) to register it across all your projects:
 
 ```sh
-claude mcp add --scope user --transport http random https://random-mcp.example.com/mcp/
+claude mcp add --scope user --transport http random https://random-mcp.example.com/mcp
 ```
 
 ```jsonc
@@ -379,7 +379,7 @@ claude mcp add --scope user --transport http random https://random-mcp.example.c
   "mcpServers": {
     "random": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://random-mcp.example.com/mcp/"]
+      "args": ["-y", "mcp-remote", "https://random-mcp.example.com/mcp"]
     }
   }
 }
@@ -393,7 +393,9 @@ Notes for remote use:
   gateway, or network policy that enforces access — or add
   [FastMCP auth](https://gofastmcp.com/servers/auth/authentication).
 - **No built-in rate limiting** — by design (see below).
-- The endpoint path is `/mcp/` (note the trailing slash).
+- The endpoint path is `/mcp` (no trailing slash). Requesting `/mcp/` works too
+  but returns a 307 redirect to `/mcp`, so point clients at `/mcp` to skip the
+  extra round-trip.
 
 ### Why there's no built-in rate limiting
 
@@ -430,7 +432,7 @@ client wiring not run here.
 | Setup | Transport | How it was verified | Status |
 | ----- | --------- | ------------------- | ------ |
 | Docker image, client-launched ([Option A](#option-a--docker-image-client-launches-it-stdio)) | stdio | Piped an MCP `initialize` into `docker run -i -e MCP_TRANSPORT=stdio …`; got a valid response reporting `v0.1.3`. | ✅ |
-| Long-running HTTP container ([Option B](#option-b--long-running-container-over-http-local)) | HTTP | FastMCP network client against `http://localhost:8000/mcp/` (listed all 5 tools, called `get_record`/`count_records`). | ✅ |
+| Long-running HTTP container ([Option B](#option-b--long-running-container-over-http-local)) | HTTP | FastMCP network client against `http://localhost:8000/mcp` (listed all 5 tools, called `get_record`/`count_records`). | ✅ |
 | Long-running HTTP container, Claude Code | HTTP | `claude mcp add --transport http …` → `claude mcp list` reported **✔ Connected**. | ✅ |
 | Local dev, console script ([from source](#using-with-an-mcp-client--local-development-from-source)) | stdio | Server proven through the in-memory FastMCP client and the test suite; the `uv run` stdio launch is the same entry point. | ☑️ |
 | Remote deployment ([Option C](#option-c--remote-deployment-http)) | HTTP | Identical to Option B but with a public URL; the HTTP endpoint is proven, a hosted instance was not stood up. | ☑️ |
@@ -466,7 +468,7 @@ version over `:latest` for reproducible deployments.
 docker run --rm -p 8000:8000 --name random-mcp ghcr.io/mitchallen/random-mcp-server:latest
 ```
 
-Then connect an HTTP MCP client to `http://localhost:8000/mcp/`.
+Then connect an HTTP MCP client to `http://localhost:8000/mcp`.
 
 ### Test a published release with make
 
