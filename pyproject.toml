@@ -1,6 +1,6 @@
 [project]
 name = "random-mcp-server"
-version = "0.2.2"
+version = "0.2.3"
 description = "An MCP server that returns random JSON things (people, words, values, coords, empty)"
 readme = "README.md"
 requires-python = ">=3.11"
