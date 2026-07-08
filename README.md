@@ -276,28 +276,58 @@ HTTP:
 }
 ```
 
-Claude Code equivalent:
+Claude Code equivalent — the image is published to two registries, so pick one:
 
 ```sh
+# GitHub Container Registry (GHCR)
 claude mcp add random -- docker run -i --rm -e MCP_TRANSPORT=stdio ghcr.io/mitchallen/random-mcp-server:latest
+
+# Docker Hub
+claude mcp add random -- docker run -i --rm -e MCP_TRANSPORT=stdio mitchallen/random-mcp-server:latest
 ```
 
-(Swap in `mitchallen/random-mcp-server:latest` to pull from Docker Hub, or pin a
-version like `:0.1.3`.)
+(Pin a version like `:0.1.3` in place of `:latest` for a reproducible setup.)
+
+**Scope — `local` (default) vs `user`.** `claude mcp add` registers the server
+in the current project only. Add `--scope user` (`-s user`) to register it once
+for **every** project on your machine instead:
+
+```sh
+# GHCR, available across all your projects
+claude mcp add --scope user random -- docker run -i --rm -e MCP_TRANSPORT=stdio ghcr.io/mitchallen/random-mcp-server:latest
+
+# Docker Hub, available across all your projects
+claude mcp add --scope user random -- docker run -i --rm -e MCP_TRANSPORT=stdio mitchallen/random-mcp-server:latest
+```
+
+(Scopes are `local` — this project, the default; `project` — shared via a
+checked-in `.mcp.json`; and `user` — all your projects.)
 
 ### Option B — Long-running container over HTTP (local)
 
-Start the container once (it serves HTTP by default), then point an
-HTTP-capable client at it:
+Start the container once (it serves HTTP by default) from either registry, then
+point an HTTP-capable client at it:
 
 ```sh
+# GitHub Container Registry (GHCR)
 docker run -d --rm -p 8000:8000 --name random-mcp ghcr.io/mitchallen/random-mcp-server:latest
+
+# Docker Hub
+docker run -d --rm -p 8000:8000 --name random-mcp mitchallen/random-mcp-server:latest
 ```
 
-Claude Code (native HTTP transport):
+Claude Code (native HTTP transport) — the client connects over HTTP, so the
+command is the same regardless of which registry you pulled from:
 
 ```sh
 claude mcp add --transport http random http://localhost:8000/mcp/
+```
+
+Add `--scope user` (`-s user`) to register it for **every** project on your
+machine instead of just the current one:
+
+```sh
+claude mcp add --scope user --transport http random http://localhost:8000/mcp/
 ```
 
 For clients that only speak **stdio**, bridge to the HTTP endpoint with
@@ -317,10 +347,17 @@ For clients that only speak **stdio**, bridge to the HTTP endpoint with
 ### Option C — Remote deployment (HTTP)
 
 If the server is hosted elsewhere, use its public URL — everything else matches
-Option B:
+Option B. There's no image to pull here (the host already runs it, from
+whichever registry they chose), so registry choice doesn't apply on your side:
 
 ```sh
 claude mcp add --transport http random https://random-mcp.example.com/mcp/
+```
+
+Add `--scope user` (`-s user`) to register it across all your projects:
+
+```sh
+claude mcp add --scope user --transport http random https://random-mcp.example.com/mcp/
 ```
 
 ```jsonc
