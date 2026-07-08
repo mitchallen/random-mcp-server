@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-07-08
+
+### Documentation
+
+- Expand the "add the MCP server" examples so each install option gives full,
+  copy-paste command lines for **both** registries (GitHub Container Registry
+  and Docker Hub) instead of swapping just the image path, including a Docker
+  Hub `mcpServers` JSON block for the client-launched stdio option.
+- Document the `claude mcp add` scope flag across all options: `local` (the
+  default, current project) vs `--scope user` (every project on your machine),
+  and note `project` for a checked-in `.mcp.json`.
+
 ## [0.2.1] - 2026-07-06
 
 ### Documentation
