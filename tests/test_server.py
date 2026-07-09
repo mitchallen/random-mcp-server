@@ -36,6 +36,8 @@ def test_server_info():
     assert info["status"] == "OK"
     assert info["app"] == server.APP_NAME
     assert "people" in info["kinds"]
+    assert info["source"] == "https://github.com/mitchallen/random-mcp-server"
+    assert info["author"] == "Mitch Allen (https://mitchallen.com)"
 
 
 def test_count_matches_default():

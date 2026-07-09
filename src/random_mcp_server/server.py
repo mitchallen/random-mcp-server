@@ -104,6 +104,8 @@ def server_info() -> dict[str, Any]:
         "count": DEFAULT_COUNT,
         "seed": _factory.seed,
         "allow_regenerate": ALLOW_REGENERATE,
+        "source": "https://github.com/mitchallen/random-mcp-server",
+        "author": "Mitch Allen (https://mitchallen.com)",
     }
 
 
