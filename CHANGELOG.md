@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-07-13
+
 ### Changed
 
 - Switched the Docker base image from `python:3.12-slim-bookworm` (Debian) to a
@@ -139,7 +141,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.4...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.1...v0.2.2
