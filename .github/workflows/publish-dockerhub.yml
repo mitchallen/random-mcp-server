@@ -20,12 +20,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build image for scanning (amd64, into daemon)
+        run: |
+          docker buildx create --use
+          docker buildx build --load -t random-mcp-server:scan .
+
+      - name: Trivy scan (fail on fixable CRITICAL/HIGH before push)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: random-mcp-server:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+
       - name: Build and push Docker image to Docker Hub
         run: |
           tag=${GITHUB_REF#refs/tags/}
           tag=${tag:1}
           image=docker.io/mitchallen/random-mcp-server
-          docker buildx create --use
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t ${image}:${tag} \
             -t ${image}:latest \

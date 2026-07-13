@@ -4,7 +4,8 @@ An MCP server that returns random JSON data (people, words, values, coords, and
 an always-empty kind). It is a Python / FastMCP adaptation of the sibling
 Node/Express REST API [`random-server`](../random-server): each REST route
 family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
-**make**; multi-stage Docker on `python:3.12-slim`.
+**make**; multi-stage Docker on a distroless Chainguard/Wolfi Python base
+(`cgr.dev/chainguard/python`) for a near-zero-CVE image.
 
 ## Layout
 
@@ -34,8 +35,11 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
   The test suite enables it via `tests/conftest.py`; `test_feature_flags.py`
   covers the default-off/hidden path by reloading the module with the env unset.
 - **Docker:** the image defaults to HTTP transport (`MCP_TRANSPORT=http`,
-  `HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port. Runs as a
-  non-root user.
+  `HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port. The base is
+  distroless Chainguard/Wolfi Python (`cgr.dev/chainguard/python`), which already
+  runs as the non-root `nonroot` user (uid 65532) and has no shell / package
+  manager. The venv is built on the matching `-dev` image so its interpreter
+  symlink resolves at runtime. `make scan` should report 0 CRITICAL/HIGH.
 - **Releasing:** `make release` (`BUMP=patch|minor|major`, default patch) bumps
   the version, commits, tags `vX.Y.Z`, and pushes — the tag triggers the GHCR +
   Docker Hub publish workflows. `make release` does **not** touch `CHANGELOG.md`,

@@ -1,0 +1,28 @@
+version: 2
+# Keeps the image and its dependencies patched automatically. This is the
+# "stay up to date" half of vulnerability management — image-scan.yml detects
+# vulns, Dependabot opens the PRs that fix them.
+updates:
+  # Base images in the Dockerfile (cgr.dev/chainguard/python runtime + -dev builder).
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "docker"
+
+  # GitHub Actions used by the workflows (incl. the trivy-action pin).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  # Python dependencies (pyproject.toml / uv.lock).
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"

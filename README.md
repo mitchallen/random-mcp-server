@@ -1,6 +1,6 @@
 # random-mcp-server
 
-[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/random-mcp-server?sort=semver&label=version)](https://github.com/mitchallen/random-mcp-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/random-mcp-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![test](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml) [![bdd](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml)
+[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/random-mcp-server?sort=semver&label=version)](https://github.com/mitchallen/random-mcp-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/random-mcp-server?sort=date&label=docker%20hub)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![Docker image size](https://img.shields.io/docker/image-size/mitchallen/random-mcp-server/latest?label=image%20size)](https://hub.docker.com/r/mitchallen/random-mcp-server/tags) [![Docker pulls](https://img.shields.io/docker/pulls/mitchallen/random-mcp-server?label=pulls)](https://hub.docker.com/r/mitchallen/random-mcp-server) [![test](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/test.yml) [![bdd](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/bdd.yml) [![image-scan](https://github.com/mitchallen/random-mcp-server/actions/workflows/image-scan.yml/badge.svg)](https://github.com/mitchallen/random-mcp-server/actions/workflows/image-scan.yml)
 
 An [MCP](https://modelcontextprotocol.io) server that returns random JSON
 things — people, words, values, coordinates, and an always-empty list. It is a
@@ -451,6 +451,12 @@ from two registries:
 The image runs the server over **streamable HTTP** by default (`MCP_TRANSPORT=http`,
 `HOST=0.0.0.0`, `PORT=8000`) so it's reachable on a published port.
 
+It's built on a **distroless [Chainguard/Wolfi](https://images.chainguard.dev/directory/image/python/versions)
+Python base** — no shell or package manager, runs as a non-root user, and scans
+**0 known vulnerabilities**. Every build is gated by a Trivy scan (fails on
+fixable CRITICAL/HIGH) and the published `:latest` is re-scanned daily; see
+[CI / Publish](#ci--publish).
+
 ### Pull the image
 
 ```sh
@@ -459,7 +465,7 @@ docker pull ghcr.io/mitchallen/random-mcp-server:latest
 docker pull mitchallen/random-mcp-server:latest
 ```
 
-Both registries also publish version tags (e.g. `:0.1.0`); prefer a pinned
+Both registries also publish version tags (e.g. `:0.2.4`); prefer a pinned
 version over `:latest` for reproducible deployments.
 
 ### Run the container

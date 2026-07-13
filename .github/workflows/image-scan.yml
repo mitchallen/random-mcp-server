@@ -1,0 +1,57 @@
+name: image-scan
+# Build the image from source and fail the build if it has fixable
+# CRITICAL/HIGH vulnerabilities. Gates PRs and pushes to main so vulns are
+# caught before they can be released.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # required to upload SARIF to the Security tab
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # Build a single-platform (amd64) image into the local daemon so Trivy
+      # can scan it. The multi-arch push build (in publish*.yml) reuses this
+      # layer cache.
+      - name: Build image for scanning
+        run: docker buildx build --load -t random-mcp-server:scan .
+
+      # Gate: fail the build on FIXABLE critical/high vulns. ignore-unfixed
+      # means an upstream CVE with no patch yet won't wedge every build.
+      - name: Trivy scan (fail on fixable CRITICAL/HIGH)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: random-mcp-server:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+
+      # Always upload a full SARIF report (including unfixed) to the Security
+      # tab for visibility, even when the gate above passes.
+      - name: Trivy scan (SARIF report, all severities)
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: random-mcp-server:scan
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: false
+
+      - name: Upload SARIF to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-image

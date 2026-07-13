@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Switched the Docker base image from `python:3.12-slim-bookworm` (Debian) to a
+  distroless **Chainguard/Wolfi** Python base (`cgr.dev/chainguard/python`). The
+  Debian base carried numerous OS-package CVEs (perl, zlib, sqlite, util-linux,
+  ncurses) with **no upstream fix available**; the Wolfi image ships those
+  packages away entirely and scans **0 vulnerabilities at every severity**. The
+  venv is built on the matching `-dev` image so its interpreter resolves at
+  runtime; the image still runs as a non-root user. The previous `apt-get
+  upgrade` and `useradd` steps are gone (no package manager / already non-root).
+- `make scan` now fails on fixable CRITICAL/HIGH vulnerabilities
+  (`--severity CRITICAL,HIGH --ignore-unfixed --exit-code 1`), matching the CI
+  gate for local parity.
+
+### Security
+
+- Automated container image vulnerability scanning with Trivy. The new
+  `image-scan` workflow builds the image and fails the build on **fixable**
+  CRITICAL/HIGH vulnerabilities on every pull request and push to `main`, and
+  the `publish` / `publish-dockerhub` workflows run the same gate **before**
+  pushing so a vulnerable image can't reach GHCR or Docker Hub.
+- Added a `scan-scheduled` workflow that re-scans the published `:latest` image
+  daily and uploads results (all severities, including unfixed) to the GitHub
+  Security tab, catching CVEs disclosed after build time.
+- Added a Dependabot config (`.github/dependabot.yml`) opening weekly update PRs
+  for the Docker base image, GitHub Actions, and Python dependencies, and
+  enabled Dependabot alerts + security updates on the repository.
+
 ## [0.2.4] - 2026-07-09
 
 ### Added

@@ -183,8 +183,10 @@ docker-test:
 # Scan container for vulnerabilities using Trivy
 .PHONY: scan
 scan:
-	@echo "Scanning Docker image for vulnerabilities..."
-	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $(IMAGE) || echo "Trivy scan failed. Is the image built?"
+	@echo "Scanning $(IMAGE) for vulnerabilities (fixable CRITICAL/HIGH fail)..."
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy \
+		image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 $(IMAGE) \
+		|| { echo "Vulnerabilities found (or image not built — run 'make docker-build')."; exit 1; }
 
 # Remove Docker image
 .PHONY: docker-rm
