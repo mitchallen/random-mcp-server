@@ -1,7 +1,9 @@
 version: 2
 # Keeps the image and its dependencies patched automatically. This is the
 # "stay up to date" half of vulnerability management — image-scan.yml detects
-# vulns, Dependabot opens the PRs that fix them.
+# vulns, Dependabot opens the PRs that fix them. Low-risk updates
+# (github-actions; docker/pip minor+patch) are auto-merged once CI passes —
+# see .github/workflows/dependabot-auto-merge.yml.
 updates:
   # Base images in the Dockerfile (cgr.dev/chainguard/python runtime + -dev builder).
   - package-ecosystem: docker
