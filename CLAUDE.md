@@ -42,10 +42,15 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
   symlink resolves at runtime. `make scan` should report 0 CRITICAL/HIGH.
 - **Releasing:** `make release` (`BUMP=patch|minor|major`, default patch) bumps
   the version, commits, tags `vX.Y.Z`, and pushes — the tag triggers the GHCR +
-  Docker Hub publish workflows. `make release` does **not** touch `CHANGELOG.md`,
-  so add the new version's entry (Keep a Changelog format, top of the file)
-  **before** running it, so the release commit/tag captures the changelog. If
-  you forget, land it as a follow-up doc commit — don't re-tag.
+  Docker Hub publish workflows. It then creates the matching **GitHub Release**
+  (`gh release create`) using that version's `CHANGELOG.md` section as the notes
+  (extracted with `awk`), so the tag, images, and Release stay in sync — the
+  Releases page previously drifted because the tag was pushed without a Release
+  object. `make release` does **not** touch `CHANGELOG.md`, so add the new
+  version's entry (Keep a Changelog format, top of the file) **before** running
+  it — the release is now **gated** on a matching `## [X.Y.Z]` section (checked
+  with `uv version --dry-run` before any mutation) and aborts early if it's
+  missing, so notes are never empty.
 
 ## Tool ↔ REST mapping
 

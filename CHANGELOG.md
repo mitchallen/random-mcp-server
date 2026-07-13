@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `make release` now creates the matching **GitHub Release** automatically
+  (`gh release create`) after pushing the tag, using that version's
+  `CHANGELOG.md` section as the release notes (extracted with `awk`).
+  Previously the target only pushed the tag, so the Releases page drifted
+  behind the tags and published images.
+- `make release` now verifies that `CHANGELOG.md` has a `## [X.Y.Z]` section for
+  the version being released **before** it bumps, tags, or pushes anything. The
+  target version is computed with `uv version --dry-run` (no mutation), and the
+  release aborts early with a helpful message if the entry is missing — so a
+  release can no longer be cut with empty auto-generated GitHub Release notes.
+
 ## [0.2.5] - 2026-07-13
 
 ### Changed
