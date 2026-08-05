@@ -3,7 +3,13 @@ name: dependabot-auto-merge
 # Native auto-merge waits for the branch-protection checks on main (unit + bdd),
 # so a bump only lands if the workflows still go green. Scope:
 #   - github-actions: all updates (CI-only, low blast radius).
-#   - docker / pip:   minor + patch only — major bumps stay manual for review.
+#   - docker / uv:    minor + patch only — major bumps stay manual for review.
+#
+# NB: package-ecosystem is Dependabot's internal identifier, not the friendly
+# name in dependabot.yml. This project declares `pip` there, but because the
+# dependencies resolve through uv.lock the metadata action reports `uv` — so
+# the original `== 'pip'` never matched and Python bumps never auto-merged.
+# `pip` is kept as an alternative in case an update reports under that name.
 on: pull_request
 
 permissions:
@@ -23,6 +29,7 @@ jobs:
         if: >-
           startsWith(steps.metadata.outputs.package-ecosystem, 'github')
           || ( (steps.metadata.outputs.package-ecosystem == 'docker'
+          || steps.metadata.outputs.package-ecosystem == 'uv'
           || steps.metadata.outputs.package-ecosystem == 'pip')
           && (steps.metadata.outputs.update-type == 'version-update:semver-minor'
           || steps.metadata.outputs.update-type == 'version-update:semver-patch') )
