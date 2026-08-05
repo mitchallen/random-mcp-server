@@ -6,8 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-08-05
+
+### Security
+
+- Bumped **cryptography** 49.0.0 → 50.0.0 in `uv.lock`
+  ([GHSA advisory](https://github.com/advisories), high severity): PKCS#7
+  `EnvelopedData` decryption exposed a Bleichenbacher oracle through
+  distinguishable errors and timing. The package is a transitive dependency
+  (via `authlib` / `joserfc` / `pyjwt` in the FastMCP auth stack) and this
+  server does not use PKCS#7 `EnvelopedData`, so exposure was minimal — but the
+  image installs `uv sync --frozen`, so the fix only reaches users in a
+  published release.
+
 ### Changed
 
+- Dependabot auto-merge now matches the **`uv`** package ecosystem. The
+  condition tested `package-ecosystem == 'pip'` — the name declared in
+  `dependabot.yml` — but the metadata action reports Dependabot's internal
+  identifier, which is `uv` for a project resolved through `uv.lock`. The
+  Python branch therefore never matched and no Python bump could auto-merge.
+  It went unnoticed because the only Python PR so far was a major, which is
+  excluded by design anyway.
 - `make release` now creates the matching **GitHub Release** automatically
   (`gh release create`) after pushing the tag, using that version's
   `CHANGELOG.md` section as the release notes (extracted with `awk`).
