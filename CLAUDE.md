@@ -51,6 +51,16 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
   it — the release is now **gated** on a matching `## [X.Y.Z]` section (checked
   with `uv version --dry-run` before any mutation) and aborts early if it's
   missing, so notes are never empty.
+- **Branch protection:** `main` requires the `unit`, `bdd` and `scan` checks
+  (`scan` is the `image-scan` job, which builds the Docker image). `scan` was
+  added on 2026-10-12, after Dependabot #18 auto-merged with a failing image
+  build — only `unit` and `bdd` were required, and the Python 3.15 base-image
+  change had broken the build. `dependabot-auto-merge.yml` uses
+  `gh pr merge --auto`, which waits for exactly these required checks, so a
+  check that isn't required doesn't gate anything. `enforce_admins` stays
+  **off** on purpose: `make release` pushes the version commit straight to
+  `main`, which admin enforcement would block (expect a "Bypassed rule
+  violations" notice on that push).
 
 ## Tool ↔ REST mapping
 
