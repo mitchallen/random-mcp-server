@@ -6,6 +6,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.7] - 2026-10-12
+
+### Security
+
+- `pyjwt` 2.13.0 → 2.15.0 in `uv.lock` (#17), which includes security fixes
+  (see the upstream 2.14.0 changelog). It is a transitive dependency of the
+  FastMCP auth stack; the image installs `uv sync --frozen`, so the fix only
+  reaches users in a published release.
+
+### Changed
+
+- `anyio` 4.14.1 → 4.14.2 (#14).
+- CI: `github/codeql-action` 4.37.4 → 4.38.2 (#9–#13, #15, #16).
+
 ## [0.2.6] - 2026-08-05
 
 ### Security
