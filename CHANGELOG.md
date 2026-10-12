@@ -6,7 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-10-12
+
+### Fixed
+
+- The image builds and runs on Python 3.15. The `cgr.dev/chainguard/python`
+  `latest` / `latest-dev` bases moved to 3.15, which broke the build (`cffi`
+  2.0.0 has no cp315 wheel, so `uv` tried to compile it and failed on a missing
+  `ffi.h`) and would then have crashed the server at import (`beartype` 0.22.9
+  imports `typing.no_type_check_decorator`, removed in 3.15). Bumped `cffi`
+  2.0.0 → 2.1.1 and `beartype` 0.22.9 → 0.23.1 in `uv.lock` (#19).
+
+### Security
+
+- Ships the `pyjwt` 2.13.0 → 2.15.0 fix intended for 0.2.7 (see below).
+
+
 ## [0.2.7] - 2026-10-12
+
+_Not published: both image publish workflows failed on the Python 3.15 base
+change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
 
 ### Security
 
