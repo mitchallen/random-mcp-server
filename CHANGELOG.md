@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Fewer Dependabot PRs.** Each ecosystem (`docker`, `github-actions`, `uv`)
+  now groups its minor + patch bumps into a single weekly PR, and a 7-day
+  `cooldown` skips releases until they have settled, so a burst of upstream
+  releases arrives as one bump to the latest rather than a PR each. Major bumps
+  still come as individual PRs, and security updates are not delayed by the
+  cooldown.
+
+### Fixed
+
+- Dependabot never ran scheduled updates for this project's Python
+  dependencies: the config declared the `pip` ecosystem, which does not pick up
+  `uv.lock`, so every Python bump to date arrived only as a security update.
+  It now uses the `uv` ecosystem (matching mcp-hello-server).
+
 ## [0.2.8] - 2026-10-12
 
 ### Fixed
