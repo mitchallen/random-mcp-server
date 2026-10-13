@@ -6,8 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.9] - 2026-10-13
+
 ### Changed
 
+- `fastmcp` 3.4.3 → 4.0.11 (#25), which brings `mcp` 1.28.1 → 2.3.0 and swaps
+  `httpx`/`httpcore` for `httpx2`/`httpcore2`. Lockfile only — the
+  `pyproject.toml` constraints are unchanged, and the unit and BDD suites pass
+  on the new stack. The published 0.2.8 images still run FastMCP 3.
+- `faker` 40.28.1 → 40.41.0 (#23).
+- Dev: `pytest-bdd` 8.1.0 → 9.0.0 (#24).
+- CI: `github/codeql-action` 4.38.2 → 4.38.3 (#21).
 - **Fewer Dependabot PRs.** Each ecosystem (`docker`, `github-actions`, `uv`)
   now groups its minor + patch bumps into a single weekly PR, and a 7-day
   `cooldown` skips releases until they have settled, so a burst of upstream
@@ -223,7 +232,11 @@ change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.5...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.9...HEAD
+[0.2.9]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.8...v0.2.9
+[0.2.8]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.7...v0.2.8
+[0.2.7]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.6...v0.2.7
+[0.2.6]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.2...v0.2.3
