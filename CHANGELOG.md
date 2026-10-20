@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.10] - 2026-10-20
+
+Dependency-refresh release; no behavior or API changes.
+
+### Changed
+
+- `fastmcp` 4.0.11 → 4.1.0 and `faker` 40.41.0 → 40.43.0 (#26). Lockfile only.
+- CI: the required `scan` check now starts the built image and runs
+  `make docker-smoke` (an MCP `initialize`) against it, so an image that builds
+  but crashes at startup fails the PR (#28).
+- Docs: corrected the required-checks list in the `dependabot-auto-merge.yml`
+  header (#27).
+
 ## [0.2.9] - 2026-10-13
 
 ### Changed
@@ -232,7 +245,8 @@ change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.9...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.10...HEAD
+[0.2.10]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.6...v0.2.7
