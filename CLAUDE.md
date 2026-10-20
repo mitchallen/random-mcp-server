@@ -96,20 +96,20 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
   (`fastmcp` 4.0.11 → 4.1.0, `faker` 40.41 → 40.43) is why v0.2.10 was cut.
   Dependabot auto-merges land on `main` without a release, so a production bump
   sits unshipped until someone cuts one.
-- **`make release` does not touch the changelog links.** Add the `## [X.Y.Z] -
-  YYYY-MM-DD` section *and* the footer links — point `[unreleased]` at
-  `compare/vX.Y.Z...HEAD` and add `[X.Y.Z]: …/compare/vPREV...vX.Y.Z` — in one
-  `docs: changelog for vX.Y.Z` commit to `main`, then run `make release`. It
-  refuses to run without the section, creates the GitHub Release from it, and
-  the `main` push shows a "Bypassed rule violations" notice (admins are not
-  enforced).
+- **`make release` does not touch the changelog links.** Add the
+  `## [X.Y.Z] - YYYY-MM-DD` section *and* the footer links — point
+  `[unreleased]` at `compare/vX.Y.Z...HEAD` and add
+  `[X.Y.Z]: …/compare/vPREV...vX.Y.Z` — in one `docs: changelog for vX.Y.Z`
+  commit to `main`, then run `make release`. It refuses to run without the
+  section, creates the GitHub Release from it, and the `main` push shows a
+  "Bypassed rule violations" notice (admins are not enforced).
 - **Publish time:** 14–20 min (v0.2.8–v0.2.10). That's normal. Compare against
   `gh run list --workflow publish.yml` before treating a slow run as hung.
-- **Verify what shipped, not just the green runs.** `docker buildx imagetools
-  inspect <image>:X.Y.Z` on both registries should list `linux/amd64` and
-  `linux/arm64`. Then `make docker-test TAG=X.Y.Z` pulls the *published* image
-  and runs the MCP `initialize` smoke check, and the reply's `serverInfo` should
-  carry the released version — v0.2.10 replied
+- **Verify what shipped, not just the green runs.**
+  `docker buildx imagetools inspect <image>:X.Y.Z` on both registries should
+  list `linux/amd64` and `linux/arm64`. Then `make docker-test TAG=X.Y.Z` pulls
+  the *published* image and runs the MCP `initialize` smoke check, and the
+  reply's `serverInfo` should carry the released version — v0.2.10 replied
   `{"name":"random-mcp-server","version":"0.2.10"}`.
 - **The required `scan` check now starts the container** (see above), so a PR
   whose image builds but won't serve MCP is caught before release, not after.
