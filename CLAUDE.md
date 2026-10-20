@@ -61,6 +61,11 @@ family becomes an MCP tool. Built with **uv**, **FastMCP**, **pytest**, and
   **off** on purpose: `make release` pushes the version commit straight to
   `main`, which admin enforcement would block (expect a "Bypassed rule
   violations" notice on that push).
+- **The `scan` check also smoke-tests the container:** `image-scan.yml` runs
+  the freshly built image and calls `make docker-smoke` against it (an MCP
+  `initialize` that must return this server's name), so an image that builds
+  but crashes at startup fails the PR. `make docker-test` runs the same check
+  against the *published* image instead.
 
 ## Tool ↔ REST mapping
 
