@@ -1,7 +1,7 @@
 name: dependabot-auto-merge
 # Auto-merges low-risk Dependabot PRs once the required CI checks pass.
-# Native auto-merge waits for the branch-protection checks on main (unit + bdd),
-# so a bump only lands if the workflows still go green. Scope:
+# Native auto-merge waits for the branch-protection checks on main (unit, bdd
+# and scan), so a bump only lands if the workflows still go green. Scope:
 #   - github-actions: all updates (CI-only, low blast radius).
 #   - docker / uv:    minor + patch only — major bumps stay manual for review.
 #
