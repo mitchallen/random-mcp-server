@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.11] - 2026-11-02
+
+Security release; no code changes.
+
+### Security
+
+- `authlib` 1.7.2 → 1.9.2: CVE-2026-96760 (CRITICAL, signature verification
+  bypass), CVE-2026-114615, CVE-2026-114616, CVE-2026-116672 (HIGH).
+- `dnspython` 2.8.0 → 2.9.1: CVE-2026-114605 (HIGH, denial of service).
+- `joserfc` → 1.7.7: CVE-2026-119283 (HIGH, denial of service).
+
+All three are transitive (`fastmcp`, `pydantic[email]`) and were flagged by
+the Trivy `image-scan` on `main`.
+
+### Changed
+
+- docs: CLAUDE.md release lessons from 2026-10-20 (#29)
+- ci: bump github/codeql-action from 4.38.3 to 4.39.0 in the actions-minor-patch group (#30)
+- deps: bump fastmcp from 4.1.0 to 4.1.1 in the python-minor-patch group (#31)
+- deps: bump opentelemetry-api from 1.43.0 to 1.45.1 (#33)
+- deps: bump fastmcp-slim from 4.1.1 to 4.1.2 (#34)
+- deps: bump fastmcp from 4.1.1 to 4.1.2 (#32)
+- ci: weekly auto-release of bot-merged dependency updates (#35)
+- deps: bump authlib, dnspython and joserfc for image-scan CVEs (#37)
+
 ## [0.2.10] - 2026-10-20
 
 Dependency-refresh release; no behavior or API changes.
@@ -245,7 +270,8 @@ change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.10...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.11...HEAD
+[0.2.11]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.10...v0.2.11
 [0.2.10]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.7...v0.2.8
