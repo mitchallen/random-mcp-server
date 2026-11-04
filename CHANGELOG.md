@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.12] - 2026-11-04
+
+Automated dependency release; no code changes.
+
+### Changed
+
+- ci: bump github/codeql-action from 4.39.0 to 4.39.1 in the actions-minor-patch group (#41)
+- deps: bump fastmcp from 4.1.2 to 4.1.4 in the python-minor-patch group (#42)
+
 ## [0.2.11] - 2026-11-02
 
 Security release; no code changes.
@@ -270,7 +279,8 @@ change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.11...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.12...HEAD
+[0.2.12]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.11...v0.2.12
 [0.2.11]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.10...v0.2.11
 [0.2.10]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.8...v0.2.9
