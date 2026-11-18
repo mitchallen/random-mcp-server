@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.14] - 2026-11-18
+
+Automated dependency release; no code changes.
+
+### Changed
+
+- deps: bump opentelemetry-api from 1.45.1 to 1.45.2 (#46)
+- deps: bump dnspython from 2.9.1 to 2.9.2 (#47)
+- ci: bump github/codeql-action from 4.39.1 to 4.39.3 in the actions-minor-patch group (#48)
+- deps: bump fastmcp from 4.1.5 to 4.1.6 in the python-minor-patch group (#49)
+
 ## [0.2.13] - 2026-11-11
 
 Automated dependency release; no code changes.
@@ -287,7 +298,8 @@ change fixed in 0.2.8, so no 0.2.7 images exist. Its changes ship in 0.2.8._
   (`server_info`, `list_records`, `get_record`, `count_records`, `regenerate`).
 - CI test/bdd workflows and GHCR + Docker Hub publish workflows.
 
-[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.13...HEAD
+[unreleased]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.14...HEAD
+[0.2.14]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.13...v0.2.14
 [0.2.13]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.12...v0.2.13
 [0.2.12]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.11...v0.2.12
 [0.2.11]: https://github.com/mitchallen/random-mcp-server/compare/v0.2.10...v0.2.11
