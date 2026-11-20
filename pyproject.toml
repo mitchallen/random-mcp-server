@@ -37,3 +37,6 @@ packages = ["src/random_mcp_server"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.uv]
+exclude-newer = "3 days"  # release-age gate: skip versions younger than 3 days
